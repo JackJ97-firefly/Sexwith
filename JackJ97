@@ -1,0 +1,174 @@
+local Players = game:GetService("Players")
+local lp = Players.LocalPlayer
+local cam = workspace.CurrentCamera
+local RunService = game:GetService("RunService")
+
+-- GUI gốc
+local gui = Instance.new("ScreenGui", lp:WaitForChild("PlayerGui"))
+gui.Name = "HakiHUD"
+gui.ResetOnSpawn = false
+
+-- Nút mở menu (≡)
+local toggleButton = Instance.new("TextButton")
+toggleButton.Size = UDim2.new(0, 40, 0, 40)
+toggleButton.Position = UDim2.new(0, 10, 0, 10)
+toggleButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+toggleButton.TextColor3 = Color3.new(1, 1, 1)
+toggleButton.Font = Enum.Font.SourceSansBold
+toggleButton.TextSize = 24
+toggleButton.Text = "≡"
+toggleButton.Parent = gui
+
+-- Khung menu chứa nút
+local menuFrame = Instance.new("Frame")
+menuFrame.Size = UDim2.new(0, 220, 0, 360)
+menuFrame.Position = UDim2.new(0, 60, 0, 10)
+menuFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+menuFrame.Visible = false
+menuFrame.Parent = gui
+
+-- Cài đặt
+local settings = {
+	Haki = false,
+	Civilian = false,
+	PoliceOW = false,
+	PoliceN = false,
+	Player = false,
+	Mode = "FOV",
+	Noclip = false,
+	Aura = false,
+	Speed = false,
+	FOV = false
+}
+
+-- Nút toggle
+local function createToggleButton(name, key)
+	local btn = Instance.new("TextButton")
+	btn.Size = UDim2.new(1, -20, 0, 30)
+	btn.Position = UDim2.new(0, 10, 0, 10 + #menuFrame:GetChildren() * 35)
+	btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+	btn.TextColor3 = Color3.new(1, 1, 1)
+	btn.Font = Enum.Font.SourceSansBold
+	btn.TextSize = 16
+	btn.Text = name .. ": OFF"
+	btn.Parent = menuFrame
+
+	btn.MouseButton1Click:Connect(function()
+		if key == "Mode" then
+			settings.Mode = (settings.Mode == "FOV") and "DISTANCE" or "FOV"
+			btn.Text = "🎯 Chế độ: " .. settings.Mode
+		else
+			settings[key] = not settings[key]
+			btn.Text = name .. ": " .. (settings[key] and "ON" or "OFF")
+		end
+	end)
+end
+
+-- Tạo các nút chức năng
+createToggleButton("🌀 Haki", "Haki")
+createToggleButton("👥 Civilian", "Civilian")
+createToggleButton("👮 PoliceOW", "PoliceOW")
+createToggleButton("👮 PoliceN", "PoliceN")
+createToggleButton("🧑‍🤝‍🧑 Player", "Player")
+createToggleButton("🎯 Chế độ", "Mode")
+createToggleButton("🚪 Noclip", "Noclip")
+createToggleButton("🌀 Interact Aura", "Aura")
+createToggleButton("⚡ Tăng tốc", "Speed")
+createToggleButton("🎯 FOV 120°", "FOV")
+
+-- Bật/tắt menu
+toggleButton.MouseButton1Click:Connect(function()
+	menuFrame.Visible = not menuFrame.Visible
+end)
+
+-- Hàm kiểm tra mục tiêu
+local function isValidTarget(model)
+	if not (model:IsA("Model") and model:FindFirstChild("Head")) then return false end
+	local humanoid = model:FindFirstChildOfClass("Humanoid")
+	if not humanoid or humanoid.Health <= 0 then return false end
+
+	if model.Name == "Civilian" and settings.Civilian then return true end
+	if model.Name == "PoliceOW" and settings.PoliceOW then return true end
+	if model.Name == "PoliceN" and settings.PoliceN then return true end
+	if Players:FindFirstChild(model.Name) and model.Name ~= lp.Name and settings.Player then return true end
+
+	return false
+end
+
+-- Kiểm tra vật cản
+local function isVisible(part)
+	local rayParams = RaycastParams.new()
+	rayParams.FilterDescendantsInstances = {lp.Character, cam}
+	rayParams.FilterType = Enum.RaycastFilterType.Blacklist
+	rayParams.IgnoreWater = true
+
+	local result = workspace:Raycast(cam.CFrame.Position, (part.Position - cam.CFrame.Position).Unit * 1000, rayParams)
+	return result and result.Instance and result.Instance:IsDescendantOf(part.Parent)
+end
+
+-- Tìm mục tiêu gần nhất
+local function getClosestTarget()
+	local closest, metric = nil, math.huge
+
+	for _, npc in pairs(workspace:GetDescendants()) do
+		if isValidTarget(npc) then
+			local head = npc:FindFirstChild("Head")
+			if head and isVisible(head) then
+				local value = 0
+				if settings.Mode == "FOV" then
+					local screenPos, onScreen = cam:WorldToViewportPoint(head.Position)
+					if not onScreen then continue end
+					value = (Vector2.new(screenPos.X, screenPos.Y) - cam.ViewportSize / 2).Magnitude
+				else
+					value = (lp.Character.HumanoidRootPart.Position - head.Position).Magnitude
+				end
+
+				if value < metric and value < 1000 then
+					metric = value
+					closest = head
+				end
+			end
+		end
+	end
+	return closest
+end
+
+-- Main loop
+RunService.RenderStepped:Connect(function()
+	-- Haki Aim
+	if settings.Haki then
+		local target = getClosestTarget()
+		if target then
+			cam.CFrame = CFrame.new(cam.CFrame.Position, target.Position)
+		end
+	end
+
+	-- FOV
+	cam.FieldOfView = settings.FOV and 120 or 70
+
+	-- Noclip
+	if settings.Noclip and lp.Character then
+		for _, v in pairs(lp.Character:GetDescendants()) do
+			if v:IsA("BasePart") then
+				v.CanCollide = false
+			end
+		end
+	end
+
+	-- Aura
+	if settings.Aura and lp.Character then
+		for _, prompt in pairs(workspace:GetDescendants()) do
+			if prompt:IsA("ProximityPrompt") and (prompt.Parent.Position - lp.Character.HumanoidRootPart.Position).Magnitude <= 12 then
+				fireproximityprompt(prompt, 0)
+			end
+		end
+	end
+
+	-- Speed
+	local h = lp.Character and lp.Character:FindFirstChildOfClass("Humanoid")
+	if h then
+		h.WalkSpeed = settings.Speed and 32 or 16
+	end
+end)
+
+print("✅ Menu thu gọn đã hoạt động kèm các tính năng Haki, Aura, Speed, Noclip, FOV.")
