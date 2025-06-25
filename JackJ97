@@ -35,14 +35,12 @@ local function createBaseGUI()
     gui.Name = "UniversalHub"
     gui.ResetOnSpawn = false
 
-    local toggleButton = Instance.new("TextButton")
+    local toggleButton = Instance.new("ImageButton") -- Đổi từ TextButton sang ImageButton
     toggleButton.Size = UDim2.new(0, 40, 0, 40)
     toggleButton.Position = UDim2.new(0, 10, 0, 10)
     toggleButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    toggleButton.TextColor3 = Color3.new(1, 1, 1)
-    toggleButton.Font = Enum.Font.SourceSansBold
-    toggleButton.TextSize = 24
-    toggleButton.Text = "≡"
+    toggleButton.Image = "rbxassetid://109296198779050" -- Gắn ảnh vào
+    toggleButton.ScaleType = Enum.ScaleType.Fit
     toggleButton.Parent = gui
 
     local menuFrame = Instance.new("Frame")
