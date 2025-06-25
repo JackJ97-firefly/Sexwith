@@ -5,264 +5,271 @@ local cam = workspace.CurrentCamera
 local RunService = game:GetService("RunService")
 
 local function isVisible(pos)
-    local origin = cam.CFrame.Position
-    local direction = (pos - origin)
-    local raycastParams = RaycastParams.new()
-    raycastParams.FilterDescendantsInstances = {lp.Character}
-    raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
-    local result = workspace:Raycast(origin, direction, raycastParams)
-    if result then
-        return (result.Position - pos).Magnitude < 3
-    end
-    return true
+local origin = cam.CFrame.Position
+local direction = (pos - origin)
+local raycastParams = RaycastParams.new()
+raycastParams.FilterDescendantsInstances = {lp.Character}
+raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+local result = workspace:Raycast(origin, direction, raycastParams)
+if result then
+return (result.Position - pos).Magnitude < 3
+end
+return true
 end
 
 local function drawESP(model)
-    if model:FindFirstChild("ESP") then return end
-    local hl = Instance.new("Highlight")
-    hl.Name = "ESP"
-    hl.Adornee = model
-    hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-    hl.FillColor = Color3.fromRGB(255, 0, 0)
-    hl.FillTransparency = 0.5
-    hl.OutlineColor = Color3.fromRGB(255, 255, 255)
-    hl.OutlineTransparency = 0
-    hl.Parent = model
+if model:FindFirstChild("ESP") then return end
+local hl = Instance.new("Highlight")
+hl.Name = "ESP"
+hl.Adornee = model
+hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+hl.FillColor = Color3.fromRGB(255, 0, 0)
+hl.FillTransparency = 0.5
+hl.OutlineColor = Color3.fromRGB(255, 255, 255)
+hl.OutlineTransparency = 0
+hl.Parent = model
 end
 
 local function createBaseGUI()
-    local gui = Instance.new("ScreenGui", lp:WaitForChild("PlayerGui"))
-    gui.Name = "UniversalHub"
-    gui.ResetOnSpawn = false
+local gui = Instance.new("ScreenGui", lp:WaitForChild("PlayerGui"))
+gui.Name = "UniversalHub"
+gui.ResetOnSpawn = false
 
-    local toggleButton = Instance.new("ImageButton") -- Đổi từ TextButton sang ImageButton
-    toggleButton.Size = UDim2.new(0, 40, 0, 40)
-    toggleButton.Position = UDim2.new(0, 10, 0, 10)
-    toggleButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    toggleButton.Image = "rbxassetid://109296198779050" -- Gắn ảnh vào
-    toggleButton.ScaleType = Enum.ScaleType.Fit
-    toggleButton.Parent = gui
+local toggleButton = Instance.new("TextButton")  
+toggleButton.Size = UDim2.new(0, 40, 0, 40)  
+toggleButton.Position = UDim2.new(0, 10, 0, 10)  
+toggleButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)  
+toggleButton.TextColor3 = Color3.new(1, 1, 1)  
+toggleButton.Font = Enum.Font.SourceSansBold  
+toggleButton.TextSize = 24  
+toggleButton.Text = "≡"  
+toggleButton.Parent = gui  
 
-    local menuFrame = Instance.new("Frame")
-    menuFrame.Size = UDim2.new(0, 220, 0, 0)
-    menuFrame.Position = UDim2.new(0, 60, 0, 10)
-    menuFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    menuFrame.AutomaticSize = Enum.AutomaticSize.Y
-    menuFrame.ClipsDescendants = true
-    menuFrame.Visible = false
-    menuFrame.Parent = gui
+local menuFrame = Instance.new("Frame")  
+menuFrame.Size = UDim2.new(0, 220, 0, 0)  
+menuFrame.Position = UDim2.new(0, 60, 0, 10)  
+menuFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)  
+menuFrame.AutomaticSize = Enum.AutomaticSize.Y  
+menuFrame.ClipsDescendants = true  
+menuFrame.Visible = false  
+menuFrame.Parent = gui  
 
-    local layout = Instance.new("UIListLayout", menuFrame)
-    layout.SortOrder = Enum.SortOrder.LayoutOrder
-    layout.Padding = UDim.new(0, 5)
+local layout = Instance.new("UIListLayout", menuFrame)  
+layout.SortOrder = Enum.SortOrder.LayoutOrder  
+layout.Padding = UDim.new(0, 5)  
 
-    toggleButton.MouseButton1Click:Connect(function()
-        menuFrame.Visible = not menuFrame.Visible
-    end)
+toggleButton.MouseButton1Click:Connect(function()  
+    menuFrame.Visible = not menuFrame.Visible  
+end)  
 
-    return menuFrame
+return menuFrame
+
 end
 
 local function loadCommonFeatures(menuFrame, settings)
-    local function createToggleButton(name, key)
-        local btn = Instance.new("TextButton")
-        btn.Size = UDim2.new(1, -20, 0, 30)
-        btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-        btn.TextColor3 = Color3.new(1, 1, 1)
-        btn.Font = Enum.Font.SourceSansBold
-        btn.TextSize = 16
-        btn.Text = name .. ": OFF"
-        btn.Parent = menuFrame
-        btn.LayoutOrder = #menuFrame:GetChildren()
+local function createToggleButton(name, key)
+local btn = Instance.new("TextButton")
+btn.Size = UDim2.new(1, -20, 0, 30)
+btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+btn.TextColor3 = Color3.new(1, 1, 1)
+btn.Font = Enum.Font.SourceSansBold
+btn.TextSize = 16
+btn.Text = name .. ": OFF"
+btn.Parent = menuFrame
+btn.LayoutOrder = #menuFrame:GetChildren()
 
-        btn.MouseButton1Click:Connect(function()
-            if key == "Mode" then
-                settings.Mode = (settings.Mode == "FOV") and "DISTANCE" or "FOV"
-                btn.Text = "🎯 Chế độ: " .. settings.Mode
-            else
-                settings[key] = not settings[key]
-                btn.Text = name .. ": " .. (settings[key] and "ON" or "OFF")
-            end
-        end)
-    end
+btn.MouseButton1Click:Connect(function()  
+        if key == "Mode" then  
+            settings.Mode = (settings.Mode == "FOV") and "DISTANCE" or "FOV"  
+            btn.Text = "🎯 Chế độ: " .. settings.Mode  
+        else  
+            settings[key] = not settings[key]  
+            btn.Text = name .. ": " .. (settings[key] and "ON" or "OFF")  
+        end  
+    end)  
+end  
 
-    createToggleButton("🌀 Haki", "Haki")
-    createToggleButton("🎯 Chế độ", "Mode")
-    createToggleButton("🚪 Noclip", "Noclip")
-    createToggleButton("🌀 Interact Aura", "Aura")
-    createToggleButton("⚡ Tăng tốc", "Speed")
-    createToggleButton("🎯 FOV 120°", "FOV")
-    createToggleButton("👁️ ESP", "ESP")
+createToggleButton("🌀 Haki", "Haki")  
+createToggleButton("🎯 Chế độ", "Mode")  
+createToggleButton("🚪 Noclip", "Noclip")  
+createToggleButton("🌀 Interact Aura", "Aura")  
+createToggleButton("⚡ Tăng tốc", "Speed")  
+createToggleButton("🎯 FOV 120°", "FOV")  
+createToggleButton("👁️ ESP", "ESP")
+
 end
 local games = {
-    [4972091010] = function()
-        local settings = {
-            Haki = false, Mode = "FOV", Noclip = false,
-            Aura = false, Speed = false, FOV = false,
-            ESP = false
-        }
-        local menu = createBaseGUI()
-        loadCommonFeatures(menu, settings)
+[4972091010] = function()
+local settings = {
+Haki = false, Mode = "FOV", Noclip = false,
+Aura = false, Speed = false, FOV = false,
+ESP = false
+}
+local menu = createBaseGUI()
+loadCommonFeatures(menu, settings)
 
-        local function isValidTarget(model)
-            if not (model:IsA("Model") and model:FindFirstChild("Head")) then return false end
-            local h = model:FindFirstChildOfClass("Humanoid")
-            if not h or h.Health <= 0 then return false end
-            local n = tonumber(model.Name)
-            return n and n >= 1 and n <= 10000
-        end
+local function isValidTarget(model)  
+        if not (model:IsA("Model") and model:FindFirstChild("Head")) then return false end  
+        local h = model:FindFirstChildOfClass("Humanoid")  
+        if not h or h.Health <= 0 then return false end  
+        local n = tonumber(model.Name)  
+        return n and n >= 1 and n <= 10000  
+    end  
 
-        local function getClosestTarget()
-            local closest, metric = nil, math.huge
-            for _, m in pairs(workspace:GetDescendants()) do
-                if isValidTarget(m) and m:FindFirstChild("Head") then
-                    local head = m.Head
-                    local screenPos, onScreen = cam:WorldToViewportPoint(head.Position)
-                    if not onScreen or not isVisible(head.Position) then continue end
-                    local val = (settings.Mode == "FOV") and
-                        (Vector2.new(screenPos.X, screenPos.Y) - cam.ViewportSize / 2).Magnitude or
-                        (lp.Character.HumanoidRootPart.Position - head.Position).Magnitude
-                    if val < metric then
-                        metric = val
-                        closest = head
-                    end
-                end
-            end
-            return closest
-        end
+    local function getClosestTarget()  
+        local closest, metric = nil, math.huge  
+        for _, m in pairs(workspace:GetDescendants()) do  
+            if isValidTarget(m) and m:FindFirstChild("Head") then  
+                local head = m.Head  
+                local screenPos, onScreen = cam:WorldToViewportPoint(head.Position)  
+                if not onScreen or not isVisible(head.Position) then continue end  
+                local val = (settings.Mode == "FOV") and  
+                    (Vector2.new(screenPos.X, screenPos.Y) - cam.ViewportSize / 2).Magnitude or  
+                    (lp.Character.HumanoidRootPart.Position - head.Position).Magnitude  
+                if val < metric then  
+                    metric = val  
+                    closest = head  
+                end  
+            end  
+        end  
+        return closest  
+    end  
 
-        RunService.RenderStepped:Connect(function()
-            if settings.Haki then
-                local tgt = getClosestTarget()
-                if tgt then cam.CFrame = CFrame.new(cam.CFrame.Position, tgt.Position) end
-            end
+    RunService.RenderStepped:Connect(function()  
+        if settings.Haki then  
+            local tgt = getClosestTarget()  
+            if tgt then cam.CFrame = CFrame.new(cam.CFrame.Position, tgt.Position) end  
+        end  
 
-            if settings.ESP then
-                for _, v in pairs(workspace:GetDescendants()) do
-                    if isValidTarget(v) then drawESP(v) end
-                end
-            else
-                for _, v in pairs(workspace:GetDescendants()) do
-                    if v:IsA("Model") then local e = v:FindFirstChild("ESP") if e then e:Destroy() end end
-                end
-            end
+        if settings.ESP then  
+            for _, v in pairs(workspace:GetDescendants()) do  
+                if isValidTarget(v) then drawESP(v) end  
+            end  
+        else  
+            for _, v in pairs(workspace:GetDescendants()) do  
+                if v:IsA("Model") then local e = v:FindFirstChild("ESP") if e then e:Destroy() end end  
+            end  
+        end  
 
-            cam.FieldOfView = settings.FOV and 120 or 70
-            if settings.Noclip and lp.Character then
-                for _, v in pairs(lp.Character:GetDescendants()) do
-                    if v:IsA("BasePart") then v.CanCollide = false end
-                end
-            end
-            if settings.Aura and lp.Character then
-                for _, p in pairs(workspace:GetDescendants()) do
-                    if p:IsA("ProximityPrompt") and (p.Parent.Position - lp.Character.HumanoidRootPart.Position).Magnitude <= 12 then
-                        fireproximityprompt(p, 0)
-                    end
-                end
-            end
-            local h = lp.Character and lp.Character:FindFirstChildOfClass("Humanoid")
-            if h then h.WalkSpeed = settings.Speed and 32 or 16 end
-        end)
-    end,
+        cam.FieldOfView = settings.FOV and 120 or 70  
+        if settings.Noclip and lp.Character then  
+            for _, v in pairs(lp.Character:GetDescendants()) do  
+                if v:IsA("BasePart") then v.CanCollide = false end  
+            end  
+        end  
+        if settings.Aura and lp.Character then  
+            for _, p in pairs(workspace:GetDescendants()) do  
+                if p:IsA("ProximityPrompt") and (p.Parent.Position - lp.Character.HumanoidRootPart.Position).Magnitude <= 12 then  
+                    fireproximityprompt(p, 0)  
+                end  
+            end  
+        end  
+        local h = lp.Character and lp.Character:FindFirstChildOfClass("Humanoid")  
+        if h then h.WalkSpeed = settings.Speed and 32 or 16 end  
+    end)  
+end,
+
 [139522132549152] = function()
-        local settings = {
-            Haki = false, Mode = "FOV", Noclip = false,
-            Aura = false, Speed = false, FOV = false, ESP = false,
-            Civilian = false, PoliceOW = false, PoliceN = false, Player = false
-        }
-        local menu = createBaseGUI()
-        loadCommonFeatures(menu, settings)
+local settings = {
+Haki = false, Mode = "FOV", Noclip = false,
+Aura = false, Speed = false, FOV = false, ESP = false,
+Civilian = false, PoliceOW = false, PoliceN = false, Player = false
+}
+local menu = createBaseGUI()
+loadCommonFeatures(menu, settings)
 
-        local function createExtraButton(name, key)
-            local btn = Instance.new("TextButton")
-            btn.Size = UDim2.new(1, -20, 0, 30)
-            btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-            btn.TextColor3 = Color3.new(1, 1, 1)
-            btn.Font = Enum.Font.SourceSansBold
-            btn.TextSize = 16
-            btn.Text = name .. ": OFF"
-            btn.Parent = menu
-            btn.LayoutOrder = #menu:GetChildren()
+local function createExtraButton(name, key)  
+        local btn = Instance.new("TextButton")  
+        btn.Size = UDim2.new(1, -20, 0, 30)  
+        btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)  
+        btn.TextColor3 = Color3.new(1, 1, 1)  
+        btn.Font = Enum.Font.SourceSansBold  
+        btn.TextSize = 16  
+        btn.Text = name .. ": OFF"  
+        btn.Parent = menu  
+        btn.LayoutOrder = #menu:GetChildren()  
 
-            btn.MouseButton1Click:Connect(function()
-                settings[key] = not settings[key]
-                btn.Text = name .. ": " .. (settings[key] and "ON" or "OFF")
-            end)
-        end
+        btn.MouseButton1Click:Connect(function()  
+            settings[key] = not settings[key]  
+            btn.Text = name .. ": " .. (settings[key] and "ON" or "OFF")  
+        end)  
+    end  
 
-        createExtraButton("👥 Civilian", "Civilian")
-        createExtraButton("👮 PoliceOW", "PoliceOW")
-        createExtraButton("👮 PoliceN", "PoliceN")
-        createExtraButton("🧑‍🤝‍🧑 Player", "Player")
+    createExtraButton("👥 Civilian", "Civilian")  
+    createExtraButton("👮 PoliceOW", "PoliceOW")  
+    createExtraButton("👮 PoliceN", "PoliceN")  
+    createExtraButton("🧑‍🤝‍🧑 Player", "Player")  
 
-        local function isValidTarget(model)
-            if not (model:IsA("Model") and model:FindFirstChild("Head")) then return false end
-            local h = model:FindFirstChildOfClass("Humanoid")
-            if not h or h.Health <= 0 then return false end
-            if model.Name == "Civilian" and settings.Civilian then return true end
-            if model.Name == "PoliceOW" and settings.PoliceOW then return true end
-            if model.Name == "PoliceN" and settings.PoliceN then return true end
-            if Players:FindFirstChild(model.Name) and model.Name ~= lp.Name and settings.Player then return true end
-            return false
-        end
+    local function isValidTarget(model)  
+        if not (model:IsA("Model") and model:FindFirstChild("Head")) then return false end  
+        local h = model:FindFirstChildOfClass("Humanoid")  
+        if not h or h.Health <= 0 then return false end  
+        if model.Name == "Civilian" and settings.Civilian then return true end  
+        if model.Name == "PoliceOW" and settings.PoliceOW then return true end  
+        if model.Name == "PoliceN" and settings.PoliceN then return true end  
+        if Players:FindFirstChild(model.Name) and model.Name ~= lp.Name and settings.Player then return true end  
+        return false  
+    end  
 
-        local function getClosestTarget()
-            local closest, metric = nil, math.huge
-            for _, m in pairs(workspace:GetDescendants()) do
-                if isValidTarget(m) and m:FindFirstChild("Head") then
-                    local head = m.Head
-                    local screenPos, onScreen = cam:WorldToViewportPoint(head.Position)
-                    if not onScreen or not isVisible(head.Position) then continue end
-                    local val = (settings.Mode == "FOV") and
-                        (Vector2.new(screenPos.X, screenPos.Y) - cam.ViewportSize / 2).Magnitude or
-                        (lp.Character.HumanoidRootPart.Position - head.Position).Magnitude
-                    if val < metric then
-                        metric = val
-                        closest = head
-                    end
-                end
-            end
-            return closest
-        end
+    local function getClosestTarget()  
+        local closest, metric = nil, math.huge  
+        for _, m in pairs(workspace:GetDescendants()) do  
+            if isValidTarget(m) and m:FindFirstChild("Head") then  
+                local head = m.Head  
+                local screenPos, onScreen = cam:WorldToViewportPoint(head.Position)  
+                if not onScreen or not isVisible(head.Position) then continue end  
+                local val = (settings.Mode == "FOV") and  
+                    (Vector2.new(screenPos.X, screenPos.Y) - cam.ViewportSize / 2).Magnitude or  
+                    (lp.Character.HumanoidRootPart.Position - head.Position).Magnitude  
+                if val < metric then  
+                    metric = val  
+                    closest = head  
+                end  
+            end  
+        end  
+        return closest  
+    end  
 
-        RunService.RenderStepped:Connect(function()
-            if settings.Haki then
-                local tgt = getClosestTarget()
-                if tgt then cam.CFrame = CFrame.new(cam.CFrame.Position, tgt.Position) end
-            end
+    RunService.RenderStepped:Connect(function()  
+        if settings.Haki then  
+            local tgt = getClosestTarget()  
+            if tgt then cam.CFrame = CFrame.new(cam.CFrame.Position, tgt.Position) end  
+        end  
 
-            if settings.ESP then
-                for _, v in pairs(workspace:GetDescendants()) do
-                    if isValidTarget(v) then drawESP(v) end
-                end
-            else
-                for _, v in pairs(workspace:GetDescendants()) do
-                    if v:IsA("Model") then local e = v:FindFirstChild("ESP") if e then e:Destroy() end end
-                end
-            end
+        if settings.ESP then  
+            for _, v in pairs(workspace:GetDescendants()) do  
+                if isValidTarget(v) then drawESP(v) end  
+            end  
+        else  
+            for _, v in pairs(workspace:GetDescendants()) do  
+                if v:IsA("Model") then local e = v:FindFirstChild("ESP") if e then e:Destroy() end end  
+            end  
+        end  
 
-            cam.FieldOfView = settings.FOV and 120 or 70
-            if settings.Noclip and lp.Character then
-                for _, v in pairs(lp.Character:GetDescendants()) do
-                    if v:IsA("BasePart") then v.CanCollide = false end
-                end
-            end
-            if settings.Aura and lp.Character then
-                for _, p in pairs(workspace:GetDescendants()) do
-                    if p:IsA("ProximityPrompt") and (p.Parent.Position - lp.Character.HumanoidRootPart.Position).Magnitude <= 12 then
-                        fireproximityprompt(p, 0)
-                    end
-                end
-            end
-            local h = lp.Character and lp.Character:FindFirstChildOfClass("Humanoid")
-            if h then h.WalkSpeed = settings.Speed and 32 or 16 end
-        end)
-    end
+        cam.FieldOfView = settings.FOV and 120 or 70  
+        if settings.Noclip and lp.Character then  
+            for _, v in pairs(lp.Character:GetDescendants()) do  
+                if v:IsA("BasePart") then v.CanCollide = false end  
+            end  
+        end  
+        if settings.Aura and lp.Character then  
+            for _, p in pairs(workspace:GetDescendants()) do  
+                if p:IsA("ProximityPrompt") and (p.Parent.Position - lp.Character.HumanoidRootPart.Position).Magnitude <= 12 then  
+                    fireproximityprompt(p, 0)  
+                end  
+            end  
+        end  
+        local h = lp.Character and lp.Character:FindFirstChildOfClass("Humanoid")  
+        if h then h.WalkSpeed = settings.Speed and 32 or 16 end  
+    end)  
+end
+
 }
 
 -- 🧠 Tự động chạy hub theo game
 if games[placeId] then
-    games[placeId]()
+gamesplaceId
 else
-    warn("❌ Game chưa được hỗ trợ trong hub này.")
+warn("❌ Game chưa được hỗ trợ trong hub này.")
 end
+
