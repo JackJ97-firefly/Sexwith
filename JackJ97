@@ -39,7 +39,7 @@ local function createBaseGUI()
     toggleButton.Size = UDim2.new(0, 40, 0, 40)
     toggleButton.Position = UDim2.new(0, 10, 0, 10)
     toggleButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    toggleButton.Image = "rbxassetid://114940908725448" -- Gắn ảnh vào
+    toggleButton.Image = "rbxassetid://3944703585" -- Gắn ảnh vào
     toggleButton.ScaleType = Enum.ScaleType.Fit
     toggleButton.Parent = gui
 
