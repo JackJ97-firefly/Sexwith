@@ -42,7 +42,7 @@ toggleButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 toggleButton.TextColor3 = Color3.new(1, 1, 1)  
 toggleButton.Font = Enum.Font.SourceSansBold  
 toggleButton.TextSize = 24  
-toggleButton.Text = "≡"  
+toggleButton.Text = "🥵"  
 toggleButton.Parent = gui  
 
 local menuFrame = Instance.new("Frame")  
