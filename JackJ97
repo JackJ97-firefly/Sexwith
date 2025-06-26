@@ -36,22 +36,20 @@ local function createBaseGUI()
     gui.ResetOnSpawn = false
     gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
-    -- Nút mở menu (icon con mắt)
     local toggleButton = Instance.new("ImageButton")
     toggleButton.Size = UDim2.new(0, 40, 0, 40)
-    toggleButton.AnchorPoint = Vector2.new(0.5, 0)
-    toggleButton.Position = UDim2.new(0.5, 0, 0, 10)
+    toggleButton.Position = UDim2.new(0, 10, 0, 0)
     toggleButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
     toggleButton.Image = "rbxassetid://140574362078497"
     toggleButton.ScaleType = Enum.ScaleType.Fit
     toggleButton.Parent = gui
-    Instance.new("UICorner", toggleButton).CornerRadius = UDim.new(0, 8)
 
-    -- Khung menu trung tâm
+    local corner = Instance.new("UICorner", toggleButton)
+    corner.CornerRadius = UDim.new(0, 8)
+
     local menuFrame = Instance.new("Frame")
     menuFrame.Size = UDim2.new(0, 220, 0, 0)
-    menuFrame.AnchorPoint = Vector2.new(0.5, 0)
-    menuFrame.Position = UDim2.new(0.5, 0, 0, 60)
+    menuFrame.Position = UDim2.new(0, 60, 0, 10)
     menuFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
     menuFrame.AutomaticSize = Enum.AutomaticSize.Y
     menuFrame.ClipsDescendants = true
