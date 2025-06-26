@@ -31,7 +31,6 @@ local function drawESP(model)
 end
 
 local function createBaseGUI()
-local function createBaseGUI()
     local gui = Instance.new("ScreenGui", lp:WaitForChild("PlayerGui"))
     gui.Name = "UniversalHub"
     gui.ResetOnSpawn = false
