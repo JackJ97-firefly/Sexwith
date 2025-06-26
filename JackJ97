@@ -78,7 +78,7 @@ local function loadCommonFeatures(menuFrame, settings)
         btn.MouseButton1Click:Connect(function()
             if key == "Mode" then
                 settings.Mode = (settings.Mode == "FOV") and "DISTANCE" or "FOV"
-                btn.Text = "🎯 Chế độ: " .. settings.Mode
+                btn.Text = "Mode: " .. settings.Mode
             else
                 settings[key] = not settings[key]
                 btn.Text = name .. ": " .. (settings[key] and "ON" or "OFF")
@@ -86,13 +86,13 @@ local function loadCommonFeatures(menuFrame, settings)
         end)
     end
 
-    createToggleButton("🌀 Haki", "Haki")
-    createToggleButton("🎯 Chế độ", "Mode")
-    createToggleButton("🚪 Noclip", "Noclip")
-    createToggleButton("🌀 Interact Aura", "Aura")
-    createToggleButton("⚡ Tăng tốc", "Speed")
-    createToggleButton("🎯 FOV 120°", "FOV")
-    createToggleButton("👁️ ESP", "ESP")
+    createToggleButton("Haki quan sát", "Haki")
+    createToggleButton("Mode", "Mode")
+    createToggleButton("Noclip", "Noclip")
+    createToggleButton("Interact Aura", "Aura")
+    createToggleButton("Speed boost", "Speed")
+    createToggleButton("FOV 120°", "FOV")
+    createToggleButton("ESP", "ESP")
 end
 local games = {
     [4972091010] = function()
@@ -112,13 +112,13 @@ local games = {
     bossButton.TextColor3 = Color3.new(1, 1, 1)
     bossButton.Font = Enum.Font.SourceSansBold
     bossButton.TextSize = 16
-    bossButton.Text = "🎯 Mục tiêu Boss: OFF"
+    bossButton.Text = "Target: Zombie"
     bossButton.Parent = menu
     bossButton.LayoutOrder = #menu:GetChildren()
 
     bossButton.MouseButton1Click:Connect(function()
         settings.TargetBoss = not settings.TargetBoss
-        bossButton.Text = "🎯 Mục tiêu Boss: " .. (settings.TargetBoss and "ON" or "OFF")
+        bossButton.Text = "Target: " .. (settings.TargetBoss and "Boss" or "Zombie")
     end)
 
     -- Kiểm tra mục tiêu
@@ -218,10 +218,10 @@ end,
             end)
         end
 
-        createExtraButton("👥 Civilian", "Civilian")
-        createExtraButton("👮 PoliceOW", "PoliceOW")
-        createExtraButton("👮 PoliceN", "PoliceN")
-        createExtraButton("🧑‍🤝‍🧑 Player", "Player")
+        createExtraButton("Civilian", "Civilian")
+        createExtraButton("PoliceOW", "PoliceOW")
+        createExtraButton("PoliceN", "PoliceN")
+        createExtraButton("Player", "Player")
 
         local function isValidTarget(model)
             if not (model:IsA("Model") and model:FindFirstChild("Head")) then return false end
@@ -292,5 +292,5 @@ end,
 if games[placeId] then
     games[placeId]()
 else
-    warn("❌ Game chưa được hỗ trợ trong hub này.")
+    warn("This game is not support on Firefly hub.")
 end
