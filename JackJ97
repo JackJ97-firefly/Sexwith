@@ -34,27 +34,36 @@ local function createBaseGUI()
     local gui = Instance.new("ScreenGui", lp:WaitForChild("PlayerGui"))
     gui.Name = "UniversalHub"
     gui.ResetOnSpawn = false
+    gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
-    local toggleButton = Instance.new("ImageButton") -- Đổi từ TextButton sang ImageButton
+    local toggleButton = Instance.new("ImageButton")
     toggleButton.Size = UDim2.new(0, 40, 0, 40)
     toggleButton.Position = UDim2.new(0, 10, 0, 10)
     toggleButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    toggleButton.Image = "rbxassetid://140574362078497" -- Gắn ảnh vào
+    toggleButton.Image = "rbxassetid://140574362078497"
     toggleButton.ScaleType = Enum.ScaleType.Fit
     toggleButton.Parent = gui
+
+    local corner = Instance.new("UICorner", toggleButton)
+    corner.CornerRadius = UDim.new(0, 8)
 
     local menuFrame = Instance.new("Frame")
     menuFrame.Size = UDim2.new(0, 220, 0, 0)
     menuFrame.Position = UDim2.new(0, 60, 0, 10)
-    menuFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    menuFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
     menuFrame.AutomaticSize = Enum.AutomaticSize.Y
     menuFrame.ClipsDescendants = true
     menuFrame.Visible = false
     menuFrame.Parent = gui
 
+    Instance.new("UICorner", menuFrame).CornerRadius = UDim.new(0, 10)
+    local stroke = Instance.new("UIStroke", menuFrame)
+    stroke.Color = Color3.fromRGB(90, 90, 90)
+    stroke.Thickness = 1.2
+
     local layout = Instance.new("UIListLayout", menuFrame)
     layout.SortOrder = Enum.SortOrder.LayoutOrder
-    layout.Padding = UDim.new(0, 5)
+    layout.Padding = UDim.new(0, 6)
 
     toggleButton.MouseButton1Click:Connect(function()
         menuFrame.Visible = not menuFrame.Visible
@@ -62,7 +71,6 @@ local function createBaseGUI()
 
     return menuFrame
 end
-
 local function loadCommonFeatures(menuFrame, settings)
     local function createToggleButton(name, key)
         local btn = Instance.new("TextButton")
